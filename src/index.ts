@@ -4,19 +4,19 @@
  * Usage:
  * 
  *  project:
- *      `npm i 'solabi-loader'`
+ *      `npm i 'sol-loader'`
  * 
  *  webpack config:
- *       // register 'solabi-loader' for .abi.json files.
+ *       // register 'sol-loader' for .abi.json files.
  *      module.exports = {
  * //...
  * module: {
  *   rules: [
  *     {
- *       test: /\.abi.json$/,
+ *       test: /\.sol$/,
  *       use: [
  *         {
- *           loader: 'solabi-loader'
+ *           loader: 'sol-loader'
  *         },
  *     ],
  *   },
@@ -26,11 +26,10 @@
  *     const path = require('path');
  *  
  * code:
- *  `import MyContract from './abis/mycontract.abi.json'
+ *  `import MyContract from './contracts/mycontract.sol'
  * 
  *  console.log(MyContract('0xdeployaddress', publicClient) -> viem contract.
  * 
- *  // typed abi object, with `as const` properly appended for viem :) 
  */
 
 import {transform} from './contract.template';
@@ -41,6 +40,9 @@ export default function (source: string) {
     const name = path.basename(this.resourcePath);
 
     try {
+        // use `forge` to compile the contract.
+
+
         JSON.parse(source);
     } catch (err) {
         throw new Error(`invalid .abi.json file -- expected valid JSON (${err})`);

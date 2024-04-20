@@ -17,7 +17,6 @@ export function transform(input: TProps): string {
     }
 
     return `
-
     import {getContract} from 'viem';
 
     /**
