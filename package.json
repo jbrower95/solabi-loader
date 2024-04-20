@@ -1,13 +1,13 @@
 {
   "name": "solabi-loader",
   "version": "1.0.0",
-  "description": "",
+  "description": "Import `.abi.json` files directly into a viem project.",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.11.6",
     "ts-node": "^10.9.2",

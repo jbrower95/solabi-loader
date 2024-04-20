@@ -4,10 +4,10 @@
  * Usage:
  * 
  *  project:
- *      `npm i 'sol-loader'`
+ *      `npm i 'solabi-loader'`
  * 
  *  webpack config:
- *       // register 'sol-loader' for .abi.json files.
+ *       // register 'solabi-loader' for .abi.json files.
  *      module.exports = {
  * //...
  * module: {
@@ -16,7 +16,7 @@
  *       test: /\.sol$/,
  *       use: [
  *         {
- *           loader: 'sol-loader'
+ *           loader: 'solabi-loader'
  *         },
  *     ],
  *   },
@@ -26,7 +26,7 @@
  *     const path = require('path');
  *  
  * code:
- *  `import MyContract from './contracts/mycontract.sol'
+ *  `import MyContract from './contracts/mycontract.abi.json'
  * 
  *  console.log(MyContract('0xdeployaddress', publicClient) -> viem contract.
  * 
@@ -34,20 +34,25 @@
 
 import {transform} from './contract.template';
 import path from 'path';
+import { assertValidJSON } from './utils';
 
-export default function (source: string) {
+export default async function (contents: string, map: string, meta: string) {
     const options = this.getOptions();
+    const callback = this.async();
     const name = path.basename(this.resourcePath);
 
     try {
-        // use `forge` to compile the contract.
-
-
-        JSON.parse(source);
-    } catch (err) {
-        throw new Error(`invalid .abi.json file -- expected valid JSON (${err})`);
+        assertValidJSON(contents);
+    } catch (error) {
+        callback(error, '');
+        return;
     }
 
     // Apply some transformations to the source...
-    return transform({abi: source, name})
+    const transformedContents = transform({abi: contents, name});
+    this.emitFile(`${name}.ts`, transformedContents);
+
+    const result = await this.importModule(`${name}.ts`)
+
+    callback(null, result.default || result);
 }
