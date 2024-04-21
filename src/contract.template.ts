@@ -1,10 +1,13 @@
 
 type TProps = {
     name: string,
-    abi: string
+    abi: any
 }
 
-const ADDRESS_TYPE =  '\`0x$\{string\}\`'
+let shaHash = (contents: string) => {
+    const { createHash } = require('crypto');
+    return createHash('sha256').update(contents).digest('hex');
+}
 
 export function transform(input: TProps): string {
 
@@ -16,34 +19,18 @@ export function transform(input: TProps): string {
         contractName = contractName.substring(0, contractName.length - 'Contract'.length);
     }
 
-    return `
-    import {getContract} from 'viem';
+    let rawSource = `
+/**
+ * This file is generated to allow for typed abi imports in TypeScript, which
+ * require an 'as const' suffix today. Unfortunately, directly importing .json via TypeScript does not
+ * create a const type as-is.
+ * 
+ * @generated %hash%
+ */
+export const abi = ${JSON.stringify(input.abi, null, 2)} as const;
 
-    /**
-     * Strongly-Typed ABI for TypeScript.
-     */
-    export abi = ${JSON.stringify(input.abi, null, 2)} as const;
-
-    /**
-     * Quickly obtain a properly typed instance of the contract.
-     */
-    export default ${contractName}Contract = (address: ${ADDRESS_TYPE}, {}) => {
-        return {
-            read: (publicClient: PublicClient) => {
-                return getContract({
-                    abi,
-                    address,
-                    publicClient
-                })
-            },
-            write: (walletClient: WalletClient) => {
-                return getContract({
-                    abi,
-                    address,
-                    walletClient
-                })
-            }
-        };
-    }
+export default abi;
 `;
+    let hash = shaHash(rawSource);
+    return rawSource.replace('%hash%', `sha256:${hash}`);
 } 

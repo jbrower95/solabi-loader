@@ -32,12 +32,12 @@
  * 
  */
 
+import { writeFileSync } from 'fs';
 import {transform} from './contract.template';
 import path from 'path';
 import { assertValidJSON } from './utils';
 
 export default async function (contents: string, map: string, meta: string) {
-    const options = this.getOptions();
     const callback = this.async();
     const name = path.basename(this.resourcePath);
 
@@ -48,11 +48,16 @@ export default async function (contents: string, map: string, meta: string) {
         return;
     }
 
-    // Apply some transformations to the source...
-    const transformedContents = transform({abi: contents, name});
-    this.emitFile(`${name}.ts`, transformedContents);
+    let json = JSON.parse(contents);
 
-    const result = await this.importModule(`${name}.ts`)
+    // some people might use the top-level 'abi' struct, or strip it out themselves.
+    if (json['abi']) {
+        json = json['abi'];
+    }
 
-    callback(null, result.default || result);
+    const transformedContents = transform({abi: json, name});
+    const definitionFile = this.resourcePath.replace(/\.abi$/g, '.abi.ts');
+
+    writeFileSync(definitionFile, transformedContents);
+    callback(null, `const Contract = require('./${name}.ts');\nexport default Contract;`);
 }

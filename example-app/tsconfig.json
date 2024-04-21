@@ -8,6 +8,7 @@
       "esModuleInterop": true,
       "allowJs": true,
       "outDir": "dist"
+      
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules/**/*"],
