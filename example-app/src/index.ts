@@ -1,8 +1,8 @@
 import abi from './Counter.abi';
-import {createPublicClient, createWalletClient, getContract, http} from 'viem';
-import {base, baseSepolia} from 'viem/chains';
+import {createPublicClient, getContract, http} from 'viem';
+import {base, mainnet} from 'viem/chains';
 
-const walletClient = createWalletClient({
+const publicClient = createPublicClient({
     chain: base,
     transport: http()
 })
@@ -10,5 +10,5 @@ const walletClient = createWalletClient({
 const contract = getContract({
     address: '0x00',
     abi,
-    client: walletClient
+    client: publicClient
 })

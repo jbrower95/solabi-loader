@@ -1,4 +1,4 @@
-
+import { basename } from "path";
 type TProps = {
     name: string,
     abi: any
@@ -10,9 +10,7 @@ let shaHash = (contents: string) => {
 }
 
 export function transform(input: TProps): string {
-
-    // contract name
-    let contractName = input.name.substring(0, input.name.length - '.abi.json'.length).toUpperCase();
+    let contractName = basename(input.name).toUpperCase();
     
     // remove the suffix if it already ends with contract.
     if (contractName.endsWith('Contract')) {
